@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>Selección de Equipos y Partidas del modelo neuronal</h2>
+<table>
+    <tr>
+        <td><label for="equipoA">Equipo A:</label></td>
+        <td>
+            <select id="equipoA">
+                <option value="">Selecciona un equipo</option>
+                <!-- Equipos se cargarán dinámicamente desde Python -->
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><label for="equipoB">Equipo B:</label></td>
+        <td>
+            <select id="equipoB">
+                <option value="">Selecciona un rival</option>
+                <!-- Equipos se cargarán dinámicamente desde Python -->
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><label for="partidas">Número de partidas:</label></td>
+        <td colspan="3">
+            <input type="number" id="partidas" min="1" step="1" value="1">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="predecir()">Predecir</button>
+        </td>
+        <td></td>
+    </tr>
+</table>
+
+<p id="resultado"></p>
+
+<script>
+    function mostrarResultadoTipo1(data) {
+        document.getElementById('equipoA').textContent = data.prediccion.equipo_a;
+        document.getElementById('equipoB').textContent = data.prediccion.equipo_b;
+        document.getElementById('victoriasA').textContent = data.prediccion.victorias_a;
+        document.getElementById('victoriasB').textContent = data.prediccion.victorias_b;
+        document.getElementById('porcentajeA').textContent = data.prediccion.porcentaje_a + "%";
+        document.getElementById('porcentajeB').textContent = data.prediccion.porcentaje_b + "%";
+    }
+
+    function predecir() {
+        // Llamada a la API Flask para hacer la predicción
+        fetch('/predict-net', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                equipoA: document.getElementById('equipoA').value,
+                equipoB: document.getElementById('equipoB').value,
+                partidas: parseInt(document.getElementById('partidas').value)
+            })
+        }).then(response => response.json())
+            .then(data => {
+                var text = 'Resultado: \n\n';
+                text += "Equipo A: " + data.prediccion.equipo_a + "\n";
+                text += "Victorias A: " + data.prediccion.victorias_a + "\n";
+                text += "Equipo B: " + data.prediccion.equipo_b + "\n";
+                text += "Victorias B: " + data.prediccion.victorias_b + "\n";
+                text += "Porcentaje A: " + data.prediccion.porcentaje_a + "%" + "\n";
+                text += "Porcentaje B: " + data.prediccion.porcentaje_b + "%" + "\n";
+                document.getElementById('resultado').innerText = text;
+                //mostrarResultadoTipo1(data);
+            });
+    }
+
+    // static/script.js
+    document.addEventListener("DOMContentLoaded", function () {
+        // Cargar equipos iniciales para el primer desplegable
+        fetch("/get_equipos_net")
+            .then(response => response.json())
+            .then(data => {
+                const equipoA = document.getElementById("equipoA");
+                data.equipos.forEach(equipo => {
+                    const option = new Option(equipo, equipo);
+                    equipoA.appendChild(option);
+                });
+            });
+
+        // Actualizar el segundo desplegable cuando se selecciona un equipo en el primero
+        document.getElementById("equipoA").addEventListener("change", function () {
+            const equipoSeleccionado = this.value;
+            fetch(`/get_rivales_net?equipo=${encodeURIComponent(equipoSeleccionado)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const equipoB = document.getElementById("equipoB");
+                    equipoB.innerHTML = "<option value=\"\">Selecciona un rival</option>";
+                    data.rivales.forEach(rival => {
+                        const option = new Option(rival, rival);
+                        equipoB.appendChild(option);
+                    });
+                });
+        });
+    });
+</script>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td {
+        border: none;
+        padding: 10px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+    }
+</style>
+{% endblock %}

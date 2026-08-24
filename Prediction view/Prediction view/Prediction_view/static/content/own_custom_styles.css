@@ -1,0 +1,25 @@
+table {
+    width: 94%;
+    border: 0;
+    background: transparent;
+    margin-left: 5%;
+    margin-right: 5%;
+    vertical-align: middle;
+}
+
+td {
+    width: 25%;
+    height: auto;
+    text-align: center;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow-x: hidden;
+    display: inline-block;
+}
+
+td img {
+    opacity: 1;
+    width: 100%;
+    height: auto;
+}

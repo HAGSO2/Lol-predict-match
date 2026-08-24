@@ -1,0 +1,6 @@
+Flask>=2.2.3
+Numpy>=2.5.1
+Pandas>=3.0.5
+tensorflow>=2.21.0
+sklearn-preprocessing>=0.1.0
+xgboost>=3.4.0
