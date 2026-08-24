@@ -14,8 +14,30 @@ from Prediction_view.pyscripts.predecir_partida_boost import predecir_partido
 
 BASE_DIR = Path(__file__).resolve().parent
 
+"""
+--------------
+--  MODELS  --
+--------------
+"""
+net_model = keras.models.load_model(f"{BASE_DIR}/models/Neuronal_net.keras")
+boost_model = model = joblib.load(f"{BASE_DIR}/models/worlds_xgb_model.pkl")
+
+"""
+--------------
+--  STATS   --
+--------------
+"""
+train_set_net = pd.read_csv(f"{BASE_DIR}/models/stats/train_data2.csv")
+net_df = pd.read_csv(f"{BASE_DIR}/models/stats/complete_set.csv")
+team_stats = pd.read_csv(f"{BASE_DIR}/models/stats/team_stats.csv")
+
+"""
+-----------------------
+--  TRANSFORMATION   --
+-----------------------
+"""
 net_scaler = StandardScaler()
-train_set_net = pd.read_csv(f"{BASE_DIR}/static/content/data/train_data2.csv")
+
 lista_columnas =["side","goldat10","goldat15","xpat10","xpat15","avg_dragons_team","avg_barons_team","avg_heralds_team","avg_towers_team","avg_dragons_vs_opp","avg_barons_vs_opp","avg_heralds_vs_opp","avg_towers_vs_opp","wins_vs_opponent"]
 train_set_net = train_set_net[lista_columnas]
 train_set_net = pd.DataFrame(
@@ -23,14 +45,13 @@ train_set_net = pd.DataFrame(
     columns=train_set_net.columns,
     index=train_set_net.index)
 
-net_df = pd.read_csv(f"{BASE_DIR}/static/content/data/complete_set.csv")
+"""
+------------------
+--  ENDPOINTS   --
+-------------------
+"""
 
-net_model = keras.models.load_model(f"{BASE_DIR}/models/Neuronal_net.keras")
-
-team_stats = pd.read_csv(f"{BASE_DIR}/static/content/data/team_stats.csv")
-
-boost_model = model = joblib.load(f"{BASE_DIR}/models/worlds_xgb_model.pkl")
-
+#Get teams from json file
 @app.route("/get_equipos_net")
 def get_equipos_net():
     return jsonify({"equipos": cargar_equipos_net()})
@@ -39,6 +60,7 @@ def get_equipos_net():
 def get_equipos_boost():
     return jsonify({"equipos": cargar_equipos_boost()})
 
+#Given a selected team, get its posibles rivals
 @app.route("/get_rivales_net")
 def get_rivales_net():
     equipo = request.args.get("equipo")
@@ -49,6 +71,7 @@ def get_rivales_boost():
     equipo = request.args.get("equipo")
     return jsonify({"rivales": get_rivales_validos_boost(equipo)})
 
+#Call to predict with the net model
 @app.route('/predict-net', methods=['POST'])
 def predict_net():
     data = request.json
@@ -64,6 +87,7 @@ def predict_net():
     #return jsonify({'prediccion': str(prediccion)})
     return jsonify({'prediccion': prediccion})
 
+#Call to predict with the boost model
 @app.route('/predict-boost', methods=['POST'])
 def predict_boost():
     data = request.json

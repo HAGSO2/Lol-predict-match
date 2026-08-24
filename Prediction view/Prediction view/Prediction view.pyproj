@@ -39,22 +39,24 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Prediction_view\" />
+    <Folder Include="Prediction_view\models\stats\" />
     <Folder Include="Prediction_view\pyscripts\" />
     <Folder Include="Prediction_view\static\" />
     <Folder Include="Prediction_view\static\content\" />
     <Folder Include="Prediction_view\static\content\imgs\" />
-    <Folder Include="Prediction_view\static\content\data\" />
     <Folder Include="Prediction_view\models\" />
     <Folder Include="Prediction_view\static\fonts\" />
     <Folder Include="Prediction_view\static\scripts\" />
     <Folder Include="Prediction_view\templates\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Prediction_view\static\content\data\complete_set.csv" />
-    <Content Include="Prediction_view\static\content\data\equipos-net.json" />
-    <Content Include="Prediction_view\static\content\data\team_stats.csv" />
-    <Content Include="Prediction_view\static\content\data\train_data2.csv" />
-    <Content Include="Prediction_view\static\content\data\worlds_xgb_dataset.csv" />
+    <Content Include="install commnads.txt" />
+    <Content Include="Prediction_view\models\stats\complete_set.csv" />
+    <Content Include="Prediction_view\models\stats\team_stats.csv" />
+    <Content Include="Prediction_view\models\stats\test_data2.csv" />
+    <Content Include="Prediction_view\models\stats\train_data2.csv" />
+    <Content Include="Prediction_view\models\stats\val_data2.csv" />
+    <Content Include="Prediction_view\models\stats\worlds_xgb_dataset.csv" />
     <Content Include="Prediction_view\static\content\imgs\angel.jpg" />
     <Content Include="Prediction_view\static\content\imgs\andrés.jpg" />
     <Content Include="Prediction_view\static\content\imgs\gabriel.jpg" />
