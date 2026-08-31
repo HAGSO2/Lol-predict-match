@@ -52,6 +52,7 @@
   <ItemGroup>
     <Content Include="install commnads.txt" />
     <Content Include="Prediction_view\models\stats\complete_set.csv" />
+    <Content Include="Prediction_view\models\stats\equipos-net.json" />
     <Content Include="Prediction_view\models\stats\team_stats.csv" />
     <Content Include="Prediction_view\models\stats\test_data2.csv" />
     <Content Include="Prediction_view\models\stats\train_data2.csv" />

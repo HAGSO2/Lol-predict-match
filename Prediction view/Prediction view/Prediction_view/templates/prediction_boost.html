@@ -2,13 +2,13 @@
 
 {% block content %}
 
-<h2>Selección de Equipos y Partidas del modelo XGBoost</h2>
+<h2>Selection of Teams and Matches of the XGBoost model</h2>
 <table>
     <tr>
-        <td><label for="equipoA">Equipo A:</label></td>
+        <td><label for="equipoA">Team A:</label></td>
         <td>
             <select id="equipoA">
-                <option value="">Selecciona un equipo</option>
+                <option value="">Select a team</option>
                 <!-- Equipos se cargarán dinámicamente desde Python -->
             </select>
         </td>
@@ -17,14 +17,15 @@
         <td><label for="equipoB">Equipo B:</label></td>
         <td>
             <select id="equipoB">
-                <option value="">Selecciona un rival</option>
+                <option value="">Select a rival</option>
                 <!-- Equipos se cargarán dinámicamente desde Python -->
             </select>
         </td>
     </tr>
     <tr>
         <td>
-            <button onclick="predecir()">Predecir</button>
+            <button onclick="predecir()" id="predict_button">Predict</button>
+            <div class="sprinner" id="spinner"></div>
         </td>
         <td></td>
     </tr>
@@ -34,20 +35,31 @@
 
 <script>
     function predecir() {
-        fetch('/predict-boost', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                equipoA: document.getElementById('equipoA').value,
-                equipoB: document.getElementById('equipoB').value,
-            })
-        }).then(response => response.json())
-            .then(data => {
-                var text = 'Resultado: \n\n'
-                text += "Ganador: " + data.prediccion.ganador + "\n";
-                text += "Confianza: " + data.prediccion.confianza + "\n";
-                document.getElementById('resultado').innerText =  text;
-            });
+        let equipoA = document.getElementById('equipoA').value;
+        let equipoB = document.getElementById('equipoB').value;
+        if (equipoA == "" || equipoA == "Select a team" || equipoB == "" || equipoB == "Select a rival") {
+            alert("Please introduce correct options");
+        } else {
+            document.getElementById('predict_button').style.display = 'none';
+            document.getElementById('spinner').style.display = 'inline-block';
+            fetch('/predict-boost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    equipoA,
+                    equipoB,
+                })
+            }).then(response => response.json())
+                .then(data => {
+                    document.getElementById('spinner').style.display = 'none';
+                    var text = 'Resultado: \n\n'
+                    text += "Ganador: " + data.prediccion.ganador + "\n";
+                    text += "Confianza: " + data.prediccion.confianza + "\n";
+                    document.getElementById('resultado').innerText = text;
+                    document.getElementById('predict_button').style.display = 'inline-block';
+                    document.getElementById('spinner').style.display = 'none';
+                });
+        }
     }
 
     // static/script.js
@@ -94,6 +106,25 @@
     input, select {
         width: 100%;
         padding: 8px;
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
 {% endblock %}

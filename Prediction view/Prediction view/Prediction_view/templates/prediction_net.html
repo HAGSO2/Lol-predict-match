@@ -2,13 +2,13 @@
 
 {% block content %}
 
-<h2>Selección de Equipos y Partidas del modelo neuronal</h2>
+<h2>Selection of Teams and Matches of the Neural Model</h2>
 <table>
     <tr>
-        <td><label for="equipoA">Equipo A:</label></td>
+        <td><label for="equipoA">Team A:</label></td>
         <td>
             <select id="equipoA">
-                <option value="">Selecciona un equipo</option>
+                <option value="">Select a team</option>
                 <!-- Equipos se cargarán dinámicamente desde Python -->
             </select>
         </td>
@@ -17,20 +17,21 @@
         <td><label for="equipoB">Equipo B:</label></td>
         <td>
             <select id="equipoB">
-                <option value="">Selecciona un rival</option>
+                <option value="">Select a rival</option>
                 <!-- Equipos se cargarán dinámicamente desde Python -->
             </select>
         </td>
     </tr>
     <tr>
-        <td><label for="partidas">Número de partidas:</label></td>
+        <td><label for="partidas">Number of matches:</label></td>
         <td colspan="3">
             <input type="number" id="partidas" min="1" step="1" value="1">
         </td>
     </tr>
     <tr>
         <td>
-            <button onclick="predecir()">Predecir</button>
+            <button onclick="predecir()" id="predict_button">Predict</button>
+            <div class="sprinner" id="spinner"></div>
         </td>
         <td></td>
     </tr>
@@ -49,27 +50,38 @@
     }
 
     function predecir() {
-        // Llamada a la API Flask para hacer la predicción
-        fetch('/predict-net', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                equipoA: document.getElementById('equipoA').value,
-                equipoB: document.getElementById('equipoB').value,
-                partidas: parseInt(document.getElementById('partidas').value)
-            })
-        }).then(response => response.json())
-            .then(data => {
-                var text = 'Resultado: \n\n';
-                text += "Equipo A: " + data.prediccion.equipo_a + "\n";
-                text += "Victorias A: " + data.prediccion.victorias_a + "\n";
-                text += "Equipo B: " + data.prediccion.equipo_b + "\n";
-                text += "Victorias B: " + data.prediccion.victorias_b + "\n";
-                text += "Porcentaje A: " + data.prediccion.porcentaje_a + "%" + "\n";
-                text += "Porcentaje B: " + data.prediccion.porcentaje_b + "%" + "\n";
-                document.getElementById('resultado').innerText = text;
-                //mostrarResultadoTipo1(data);
-            });
+        let equipoA = document.getElementById('equipoA').value;
+        let equipoB = document.getElementById('equipoB').value;
+        let partidas = parseInt(document.getElementById('partidas').value);
+        if (equipoA == "" || equipoA == "Select a team" || equipoB == "" || equipoB == "Select a rival" || partidas <= 0) {
+            alert("Please introduce correct options");
+        } else {
+            // Llamada a la API Flask para hacer la predicción
+            document.getElementById('predict_button').style.display = 'none';
+            document.getElementById('spinner').style.display = 'inline-block';
+            fetch('/predict-net', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    equipoA,
+                    equipoB,
+                    partidas
+                })
+            }).then(response => response.json())
+                .then(data => {
+                    var text = 'Resultado: \n\n';
+                    text += "Equipo A: " + data.prediccion.equipo_a + "\n";
+                    text += "Victorias A: " + data.prediccion.victorias_a + "\n";
+                    text += "Equipo B: " + data.prediccion.equipo_b + "\n";
+                    text += "Victorias B: " + data.prediccion.victorias_b + "\n";
+                    text += "Porcentaje A: " + data.prediccion.porcentaje_a + "%" + "\n";
+                    text += "Porcentaje B: " + data.prediccion.porcentaje_b + "%" + "\n";
+                    document.getElementById('resultado').innerText = text;
+                    //mostrarResultadoTipo1(data);
+                    document.getElementById('predict_button').style.display = 'inline-block';
+                    document.getElementById('spinner').style.display = 'none';
+                });
+        }
     }
 
     // static/script.js
@@ -115,6 +127,25 @@
     input, select {
         width: 100%;
         padding: 8px;
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
 {% endblock %}
